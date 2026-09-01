@@ -312,6 +312,7 @@ table.datatable input[type="checkbox"]{width:auto; cursor:pointer;}
 
 /* ===== SUMMARY / RESUMO ===== */
 .summary-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;}
+.summary-grid-5{grid-template-columns:repeat(5,1fr);}
 .stat-card{background:var(--card-bg); border:1px solid var(--line-strong); border-top:3px solid var(--accent-blue); padding:12px 14px;}
 .stat-card .st-label{font-size:9.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700;}
 .stat-card .st-val{font-family:var(--font-mono); font-size:18px; font-weight:600; color:var(--ink); margin-top:5px;}
@@ -425,6 +426,48 @@ table.datatable td .field-row input{flex:1;}
 .rank-table td.num{font-family:var(--font-mono); text-align:right;}
 .rank-pos{font-family:var(--font-mono); font-weight:700; color:var(--ink);}
 .rank-pos.top1{color:var(--amber-dark);}
+
+/* ===== COMPARADOR DE PROJETOS ===== */
+.comp-check-list{display:flex; flex-wrap:wrap; gap:8px;}
+.comp-check-item{
+  display:flex; align-items:center; gap:7px; padding:6px 12px; border:1px solid var(--line-strong);
+  border-radius:14px; font-size:12px; cursor:pointer; background:#fff;
+}
+.comp-check-item:has(input:checked){background:var(--accent-blue-tint); border-color:var(--accent-blue);}
+.comp-check-item input{cursor:pointer;}
+
+/* ===== MODAL DE MENSAGEM EDITÁVEL ===== */
+.modal-overlay{
+  position:fixed; inset:0; z-index:900; background:rgba(10,12,16,0.5);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.modal-box{
+  width:520px; max-width:100%; max-height:90vh; background:var(--card-bg);
+  border:1px solid var(--line-strong); box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  display:flex; flex-direction:column;
+}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between; padding:12px 16px;
+  border-bottom:1px solid var(--line); font-size:13px; color:var(--ink);
+}
+.modal-body{padding:14px 16px; overflow-y:auto;}
+.modal-body textarea{
+  width:100%; border:1px solid var(--line-strong); border-radius:var(--radius-ctl); padding:10px;
+  font-family:var(--font-ui); font-size:12.5px; color:var(--ink); background:#fff; resize:vertical; line-height:1.5;
+}
+.modal-actions{
+  display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px solid var(--line);
+}
+.modal-actions .btn{flex:1; min-width:140px; justify-content:center;}
+
+/* ===== COMPARADOR DE CUSTOS — GRUPOS POR CATEGORIA ===== */
+.comp-group-card{margin-bottom:16px;}
+.comp-group-head{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  padding:10px 14px; border-bottom:1px solid var(--line); background:#FAFAFB;
+}
+.comp-group-head b{font-size:13px; color:var(--ink); text-transform:uppercase; letter-spacing:0.03em;}
+.comp-group-best{font-size:11.5px; color:var(--good);}
 
 /* ===== LUCRO / CONTRATO ===== */
 .form-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; background:var(--card-bg); border:1px solid var(--line-strong); padding:16px 18px;}
@@ -610,6 +653,9 @@ html.dark-theme .user-pill,
 html.dark-theme .form-field input,
 html.dark-theme .form-field select,
 html.dark-theme .preset-btn,
+html.dark-theme .comp-check-item,
+html.dark-theme .modal-box,
+html.dark-theme .modal-body textarea,
 html.dark-theme .cal-day,
 html.dark-theme table.datatable input:focus,
 html.dark-theme table.datatable select:focus,
@@ -633,6 +679,7 @@ html.dark-theme .btn-add{background:#000; color:#fff;}
 html.dark-theme .table-toolbar,
 html.dark-theme .list-toolbar,
 html.dark-theme .dash-panel-head,
+html.dark-theme .comp-group-head,
 html.dark-theme .cancel-box{background:var(--content-bg);}
 html.dark-theme table.datatable tbody tr:nth-child(even),
 html.dark-theme .rank-table tbody tr:nth-child(even),
@@ -800,6 +847,10 @@ html.dark-theme #authScreen{background:var(--content-bg);}
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg>
         Materiais <span class="count" id="cnt-mat">0</span>
       </button>
+      <button data-tab="hospedagem">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13M3 21h18M9 21v-6h6v6"/></svg>
+        Hospedagem <span class="count" id="cnt-hosp">0</span>
+      </button>
       <button data-tab="impostos">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M15 4v5h5M8 13h8M8 17h5"/></svg>
         Impostos e Taxas <span class="count" id="cnt-imp">0</span>
@@ -821,6 +872,10 @@ html.dark-theme #authScreen{background:var(--content-bg);}
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 15l4-5 3 3 5-7"/></svg>
         Relatório de Lucro &amp; ROI
       </button>
+      <button data-tab="custocomp">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Comparador de Custos
+      </button>
       <div class="nav-group-label">Gestão</div>
       <button data-tab="projetos">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
@@ -829,6 +884,10 @@ html.dark-theme #authScreen{background:var(--content-bg);}
       <button data-tab="ranking">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4zM5 6H3v2a4 4 0 004 4M19 6h2v2a4 4 0 01-4 4"/></svg>
         Ranking de Lucro
+      </button>
+      <button data-tab="comparar">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="5" height="11"/><rect x="10" y="5" width="5" height="16"/><rect x="17" y="13" width="5" height="8"/></svg>
+        Comparar Projetos
       </button>
       <div class="nav-group-label">Equipe</div>
       <button data-tab="equipe">
@@ -1079,6 +1138,42 @@ html.dark-theme #authScreen{background:var(--content-bg);}
         </div>
       </section>
 
+      <!-- TAB: HOSPEDAGEM -->
+      <section class="tab" id="tab-hospedagem">
+        <div class="sec-head">
+          <div><h2>Hospedagem</h2><div class="sec-desc">Diárias de hotel/pousada para a equipe durante o projeto (check-in e check-out calculam as diárias automaticamente).</div></div>
+          <button class="btn btn-add" onclick="addHospedagem()">+ Adicionar Hospedagem</button>
+        </div>
+        <div class="card">
+          <div class="list-toolbar">
+            <span class="list-count" id="lc-hospedagem">0 itens</span>
+            <button class="btn btn-del" id="bulkdel-hospedagem" style="display:none;" onclick="excluirSelecionados('hospedagem')">🗑 Excluir selecionados</button>
+          </div>
+          <div class="table-scroll">
+          <table class="datatable">
+            <thead><tr>
+              <th class="col-tiny"><input type="checkbox" id="selall-hospedagem" onchange="toggleSelectAll('hospedagem', this.checked)"></th>
+              <th style="width:22%">Hotel / Local</th>
+              <th style="width:14%">Hóspede(s)</th>
+              <th style="width:12%">Check-in</th>
+              <th style="width:12%">Check-out</th>
+              <th style="width:8%">Diárias</th>
+              <th style="width:14%">Valor da Diária (R$)</th>
+              <th style="width:14%">Total (R$)</th>
+              <th class="col-tiny"></th>
+            </tr></thead>
+            <tbody id="body-hospedagem"></tbody>
+            <tfoot><tr>
+              <td colspan="7" style="text-align:right;">SUBTOTAL — HOSPEDAGEM</td>
+              <td class="num" id="total-hospedagem">R$ 0,00</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+          </div>
+          <div class="table-toolbar"><span class="hint">Preencha Check-in/Check-out para as "Diárias" serem calculadas automaticamente. Total = Diárias × Valor da diária.</span></div>
+        </div>
+      </section>
+
       <!-- TAB: IMPOSTOS E TAXAS -->
       <section class="tab" id="tab-impostos">
         <div class="sec-head">
@@ -1125,11 +1220,12 @@ html.dark-theme #authScreen{background:var(--content-bg);}
           <div><h2>Resumo Final do Orçamento</h2><div class="sec-desc">Consolidação de todos os custos, em Real e em Dólar.</div></div>
         </div>
 
-        <div class="summary-grid">
+        <div class="summary-grid summary-grid-5">
           <div class="stat-card"><div class="st-label">Funcionários</div><div class="st-val num" id="sum-func">R$ 0,00</div></div>
           <div class="stat-card"><div class="st-label">Veículos</div><div class="st-val num" id="sum-veic">R$ 0,00</div></div>
           <div class="stat-card"><div class="st-label">Combustível</div><div class="st-val num" id="sum-comb">R$ 0,00</div></div>
           <div class="stat-card"><div class="st-label">Materiais</div><div class="st-val num" id="sum-mat">R$ 0,00</div></div>
+          <div class="stat-card"><div class="st-label">Hospedagem</div><div class="st-val num" id="sum-hosp">R$ 0,00</div></div>
         </div>
         <div class="summary-grid" style="grid-template-columns:1fr 1fr;">
           <div class="stat-card"><div class="st-label">Subtotal dos Custos (sem impostos)</div><div class="st-val num" id="sum-subtotal">R$ 0,00</div></div>
@@ -1311,6 +1407,18 @@ html.dark-theme #authScreen{background:var(--content-bg);}
         </div>
       </section>
 
+      <!-- TAB: COMPARADOR DE PROJETOS -->
+      <section class="tab" id="tab-comparar">
+        <div class="sec-head">
+          <div><h2>Comparar Projetos</h2><div class="sec-desc">Selecione de 2 a 3 projetos salvos para ver custo, lucro, margem e ROI lado a lado.</div></div>
+        </div>
+        <div class="card" style="padding:14px 16px;">
+          <div class="comp-check-list" id="compSelecao"></div>
+        </div>
+        <div id="compTabela" style="margin-top:16px; overflow-x:auto;"></div>
+      </section>
+
+
       <!-- TAB: RELATÓRIO DE LUCRO & ROI -->
       <section class="tab" id="tab-relatorio">
         <div class="sec-head">
@@ -1358,6 +1466,48 @@ html.dark-theme #authScreen{background:var(--content-bg);}
         </div>
       </section>
 
+      <!-- TAB: COMPARADOR DE CUSTOS / COTAÇÕES -->
+      <section class="tab" id="tab-custocomp">
+        <div class="sec-head">
+          <div><h2>Comparador de Custos</h2><div class="sec-desc">Compare cotações de fornecedores do MESMO produto/serviço (ex: Carro, Internet, Hospedagem) e veja qual sai mais barato por dia/unidade. Cada categoria é comparada separadamente.</div></div>
+          <button class="btn btn-outline" onclick="limparComparadorCustos()">🗑 Limpar Tudo</button>
+        </div>
+
+        <div class="form-grid" style="grid-template-columns:1fr 1.4fr 1fr 1fr 0.8fr;">
+          <div class="form-field">
+            <label>Categoria / Produto</label>
+            <input type="text" id="cc-categoria" list="listaCategoriasComparador" placeholder="Ex: Carro, Internet, Hospedagem">
+            <datalist id="listaCategoriasComparador">
+              <option value="Carro / Veículo">
+              <option value="Internet">
+              <option value="Hospedagem">
+              <option value="Material">
+              <option value="Combustível">
+              <option value="Mão de obra">
+            </datalist>
+          </div>
+          <div class="form-field">
+            <label>Fornecedor / Opção</label>
+            <input type="text" id="cc-nome" placeholder="Ex: Loja A">
+          </div>
+          <div class="form-field">
+            <label>Valor Total (R$)</label>
+            <input type="text" inputmode="decimal" id="cc-valor" placeholder="0,00">
+          </div>
+          <div class="form-field">
+            <label>Quantidade</label>
+            <input type="text" inputmode="decimal" id="cc-qtd" placeholder="Ex: 2">
+          </div>
+          <div class="form-field">
+            <label>Unidade</label>
+            <input type="text" id="cc-unidade" placeholder="dia, un, mês..." value="dia">
+          </div>
+        </div>
+        <button class="btn btn-add" style="margin:14px 0 18px;" onclick="addOpcaoComparadorCustos()">+ Adicionar Opção</button>
+
+        <div id="comparadorCustosGrupos"></div>
+      </section>
+
       <!-- TAB: EQUIPE — CADASTRO DE FUNCIONÁRIOS -->
       <section class="tab" id="tab-equipe">
         <div class="sec-head">
@@ -1377,7 +1527,12 @@ html.dark-theme #authScreen{background:var(--content-bg);}
             <label>Telefone (WhatsApp)</label>
             <input type="text" id="eq-telefone" value="+55 " placeholder="+55 (DD) 90000-0000">
           </div>
-          <button class="btn btn-add" onclick="addFuncionarioGlobal()">+ Cadastrar Funcionário</button>
+          <div class="form-field" style="min-width:210px;">
+            <label>E-mail</label>
+            <input type="text" id="eq-email" placeholder="funcionario@email.com">
+          </div>
+          <button class="btn btn-add" id="btnCadastrarFuncionario" onclick="addFuncionarioGlobal()">+ Cadastrar Funcionário</button>
+          <button class="btn btn-outline" id="btnCancelarEdicaoFuncionario" style="display:none;" onclick="cancelarEdicaoFuncionarioGlobal()">Cancelar edição</button>
         </div>
 
         <div id="conflitosResumo" style="display:none;" class="viab-banner viab-warn"></div>
@@ -1493,6 +1648,28 @@ html.dark-theme #authScreen{background:var(--content-bg);}
   </div>
 </div>
 
+<!-- ===== MODAL: mensagem editável antes de enviar (WhatsApp / E-mail) ===== -->
+<div class="modal-overlay" id="msgModalOverlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-head">
+      <b id="msgModalNome">Mensagem</b>
+      <button class="icon-action" onclick="fecharModalMensagem()" title="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:8px;">Edite o texto abaixo à vontade antes de enviar.</div>
+      <textarea id="msgModalTexto" rows="14"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-whatsapp" onclick="confirmarEnvioWhatsapp()">📲 Enviar via WhatsApp</button>
+      <button class="btn btn-outline" onclick="confirmarEnvioEmail()">📧 Enviar via Gmail</button>
+      <button class="btn btn-ghost" onclick="fecharModalMensagem()">Cancelar</button>
+    </div>
+    <div style="padding:0 16px 12px; text-align:center;">
+      <a href="#" onclick="confirmarEnvioEmailPadrao(); return false;" style="font-size:11px; color:var(--muted); text-decoration:underline;">Não usa Gmail? Abrir com outro programa de e-mail (Outlook, etc.)</a>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    ESTADO DA APLICAÇÃO (em memória — sem localStorage)
@@ -1504,6 +1681,7 @@ const state = {
   veiculos: [],
   combustivel: [],
   materiais: [],
+  hospedagem: [],
   impostos: [],
   cotacao: null,       // valor numérico USD->BRL
   cotacaoManual: false,
@@ -1623,11 +1801,12 @@ const TIPOS_COMBUSTIVEL = ['Gasolina Comum','Gasolina Aditivada','Etanol','Diese
 
 /* Bases de cálculo disponíveis para impostos/taxas */
 const BASE_OPTIONS = [
-  {key:'total',        label:'Total dos Custos (Mão de obra + Veículos + Combustível + Materiais)'},
+  {key:'total',        label:'Total dos Custos (Mão de obra + Veículos + Combustível + Materiais + Hospedagem)'},
   {key:'funcionarios',  label:'Somente Mão de Obra (Funcionários)'},
   {key:'veiculos',      label:'Somente Veículos'},
   {key:'combustivel',   label:'Somente Combustível'},
   {key:'materiais',     label:'Somente Materiais'},
+  {key:'hospedagem',    label:'Somente Hospedagem'},
 ];
 function baseLabel(key){ const o = BASE_OPTIONS.find(b=>b.key===key); return o ? o.label : key; }
 
@@ -1757,6 +1936,8 @@ function goToTab(tab){
   if(tab==='contrato') recalcContrato();
   if(tab==='projetos') renderMeusProjetos();
   if(tab==='ranking') renderRanking();
+  if(tab==='comparar') renderComparador();
+  if(tab==='custocomp') renderComparadorCustos();
   if(tab==='relatorio') renderRelatorioFinanceiro();
   if(tab==='equipe') renderEquipe();
   if(tab==='calProjetos') renderCalendario('calProjetos');
@@ -1900,6 +2081,73 @@ function recalcFuncionarios(){
   });
   document.getElementById('total-funcionarios').textContent = brl(total);
   atualizarConflitosEquipe();
+}
+
+/* =========================================================
+   HOSPEDAGEM
+   ========================================================= */
+function addHospedagem(){
+  state.hospedagem.push({id:uid++, nome:'', hospede:'', checkin:'', checkout:'', diarias:1, valorDiaria:0});
+  renderHospedagem();
+}
+function removeHospedagem(id){
+  state.hospedagem = state.hospedagem.filter(r=>r.id!==id);
+  renderHospedagem();
+}
+function renderHospedagem(){
+  const body = document.getElementById('body-hospedagem');
+  body.innerHTML = '';
+  if(state.hospedagem.length===0){
+    body.innerHTML = '<tr class="empty-row"><td colspan="9">Nenhuma hospedagem lançada. Clique em "+ Adicionar Hospedagem".</td></tr>';
+  }
+  let total = 0;
+  state.hospedagem.forEach(r=>{
+    const t = num(r.diarias) * num(r.valorDiaria);
+    total += t;
+    const tr = document.createElement('tr');
+    tr.id = 'hr-'+r.id;
+    tr.innerHTML = `
+      <td class="col-tiny"><input type="checkbox" ${selecionados.hospedagem.has(r.id)?'checked':''} onchange="toggleRowCheck('hospedagem', ${r.id}, this.checked)"></td>
+      <td><input type="text" value="${esc(r.nome)}" placeholder="Ex: Hotel Central" oninput="updateRow('hospedagem', ${r.id}, 'nome', this.value)"></td>
+      <td><input type="text" value="${esc(r.hospede)}" placeholder="Nome(s)" oninput="updateRow('hospedagem', ${r.id}, 'hospede', this.value)"></td>
+      <td><input type="date" id="hin-${r.id}" value="${r.checkin||''}" onchange="updateHospedagemData(${r.id}, 'checkin', this.value)"></td>
+      <td><input type="date" id="hout-${r.id}" value="${r.checkout||''}" onchange="updateHospedagemData(${r.id}, 'checkout', this.value)"></td>
+      <td><input type="text" inputmode="decimal" class="num-input" id="hdiarias-${r.id}" value="${r.diarias}" oninput="updateRow('hospedagem', ${r.id}, 'diarias', this.value)"></td>
+      <td><input type="text" inputmode="decimal" class="num-input" value="${r.valorDiaria}" oninput="updateRow('hospedagem', ${r.id}, 'valorDiaria', this.value)"></td>
+      <td class="num" id="ht-${r.id}">${brl(t)}</td>
+      <td class="col-tiny"><button class="btn-del" onclick="removeHospedagem(${r.id})">✕</button></td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('total-hospedagem').textContent = brl(total);
+  document.getElementById('cnt-hosp').textContent = state.hospedagem.length;
+  atualizarListToolbar('hospedagem');
+}
+/* atualiza check-in/check-out e recalcula as diárias automaticamente pelo período */
+function updateHospedagemData(id, campo, valor){
+  const row = state.hospedagem.find(r=>r.id===id);
+  if(!row) return;
+  row[campo] = valor;
+  if(row.checkin && row.checkout){
+    const d = diasEntre(row.checkin, row.checkout);
+    if(d>0){
+      row.diarias = d;
+      const diariasInput = document.getElementById('hdiarias-'+id);
+      if(diariasInput) diariasInput.value = d;
+    }
+  }
+  recalcHospedagem();
+  recalcImpostos();
+}
+function recalcHospedagem(){
+  let total = 0;
+  state.hospedagem.forEach(r=>{
+    const t = num(r.diarias) * num(r.valorDiaria);
+    total += t;
+    const cell = document.getElementById('ht-'+r.id);
+    if(cell) cell.textContent = brl(t);
+  });
+  document.getElementById('total-hospedagem').textContent = brl(total);
+  atualizarListToolbar('hospedagem');
 }
 
 /* =========================================================
@@ -2069,6 +2317,7 @@ function baseValorParaChave(key, tot){
     case 'veiculos': return tot.tVeic;
     case 'combustivel': return tot.tComb;
     case 'materiais': return tot.tMat;
+    case 'hospedagem': return tot.tHosp || 0;
     default: return tot.total; // total dos custos diretos, sem impostos
   }
 }
@@ -2138,8 +2387,8 @@ function recalcImpostos(){
 /* =========================================================
    SELEÇÃO MÚLTIPLA / EXCLUSÃO EM MASSA (tabelas de custo)
    ========================================================= */
-const selecionados = { funcionarios:new Set(), veiculos:new Set(), combustivel:new Set(), materiais:new Set(), impostos:new Set() };
-const RENDER_TABELA = { funcionarios:renderFuncionarios, veiculos:renderVeiculos, combustivel:renderCombustivel, materiais:renderMateriais, impostos:renderImpostos };
+const selecionados = { funcionarios:new Set(), veiculos:new Set(), combustivel:new Set(), materiais:new Set(), hospedagem:new Set(), impostos:new Set() };
+const RENDER_TABELA = { funcionarios:renderFuncionarios, veiculos:renderVeiculos, combustivel:renderCombustivel, materiais:renderMateriais, hospedagem:renderHospedagem, impostos:renderImpostos };
 function toggleRowCheck(col, id, checked){
   if(checked) selecionados[col].add(id); else selecionados[col].delete(id);
   atualizarListToolbar(col);
@@ -2183,7 +2432,7 @@ function excluirSelecionados(col){
    inputs — recriar o DOM a cada tecla faz o campo perder o foco.
    Como os impostos podem usar qualquer categoria de custo como base de
    cálculo, sempre recalculamos os impostos também após editar custos. */
-const RECALC = { funcionarios:recalcFuncionarios, veiculos:recalcVeiculos, combustivel:recalcCombustivel, materiais:recalcMateriais, impostos:recalcImpostos };
+const RECALC = { funcionarios:recalcFuncionarios, veiculos:recalcVeiculos, combustivel:recalcCombustivel, materiais:recalcMateriais, hospedagem:recalcHospedagem, impostos:recalcImpostos };
 function updateRow(colecao, id, campo, valor){
   const row = state[colecao].find(r=>r.id===id);
   if(!row) return;
@@ -2201,12 +2450,13 @@ function totais(){
   const tVeic = state.veiculos.reduce((a,r)=>a + num(r.dias)*num(r.custoDiaria), 0);
   const tComb = state.combustivel.reduce((a,r)=>a + num(r.litros)*num(r.precoLitro), 0);
   const tMat  = state.materiais.reduce((a,r)=>a + num(r.qtd)*num(r.valorUnit), 0);
-  const total = tFunc + tVeic + tComb + tMat;
-  return {tFunc, tVeic, tComb, tMat, total};
+  const tHosp = state.hospedagem.reduce((a,r)=>a + num(r.diarias)*num(r.valorDiaria), 0);
+  const total = tFunc + tVeic + tComb + tMat + tHosp;
+  return {tFunc, tVeic, tComb, tMat, tHosp, total};
 }
 
 function renderResumo(){
-  const {tFunc, tVeic, tComb, tMat, total} = totais();
+  const {tFunc, tVeic, tComb, tMat, tHosp, total} = totais();
   const tImp = calcTotalImpostos();
   const totalFinal = total + tImp;
   const rate = state.cotacao;
@@ -2214,6 +2464,7 @@ function renderResumo(){
   document.getElementById('sum-veic').textContent = brl(tVeic);
   document.getElementById('sum-comb').textContent = brl(tComb);
   document.getElementById('sum-mat').textContent  = brl(tMat);
+  document.getElementById('sum-hosp').textContent = brl(tHosp);
   document.getElementById('sum-subtotal').textContent = brl(total);
   document.getElementById('sum-impostos').textContent = brl(tImp);
   document.getElementById('sum-total-brl').textContent = brl(totalFinal);
@@ -2225,6 +2476,7 @@ function renderResumo(){
     {label:'Veículos', v:tVeic},
     {label:'Combustível', v:tComb},
     {label:'Materiais', v:tMat},
+    {label:'Hospedagem', v:tHosp},
     {label:'Impostos e Taxas', v:tImp},
   ];
   const body = document.getElementById('breakdown-body');
@@ -2421,8 +2673,9 @@ function calcularFluxoMensalDe(projData){
   const tVeic = (projData.veiculos||[]).reduce((a,r)=>a + num(r.dias)*num(r.custoDiaria), 0);
   const tComb = (projData.combustivel||[]).reduce((a,r)=>a + num(r.litros)*num(r.precoLitro), 0);
   const tMat  = (projData.materiais||[]).reduce((a,r)=>a + num(r.qtd)*num(r.valorUnit), 0);
-  const custoDireto = tFunc+tVeic+tComb+tMat;
-  const tot = {tFunc, tVeic, tComb, tMat, total:custoDireto};
+  const tHosp = (projData.hospedagem||[]).reduce((a,r)=>a + num(r.diarias)*num(r.valorDiaria), 0);
+  const custoDireto = tFunc+tVeic+tComb+tMat+tHosp;
+  const tot = {tFunc, tVeic, tComb, tMat, tHosp, total:custoDireto};
   const tImp = (projData.impostos||[]).reduce((a,r)=> a + valorImposto(r, tot), 0);
   const custo = custoDireto + tImp;
   if(N<=0 || valor<=0){ return null; }
@@ -2767,7 +3020,7 @@ function gerarPDF(){
   const marginX = 14;
   let y = 16;
 
-  const {tFunc, tVeic, tComb, tMat, total} = totais();
+  const {tFunc, tVeic, tComb, tMat, tHosp, total} = totais();
   const tImp = calcTotalImpostos();
   const totalFinal = total + tImp;
   const rate = state.cotacao;
@@ -2840,6 +3093,7 @@ function gerarPDF(){
       ['Veículos', brl(tVeic), rate ? usd(tVeic/rate) : '—'],
       ['Combustível', brl(tComb), rate ? usd(tComb/rate) : '—'],
       ['Materiais e Investimentos', brl(tMat), rate ? usd(tMat/rate) : '—'],
+      ['Hospedagem', brl(tHosp), rate ? usd(tHosp/rate) : '—'],
       ['Subtotal dos Custos', brl(total), rate ? usd(total/rate) : '—'],
       ['Impostos e Taxas', brl(tImp), rate ? usd(tImp/rate) : '—'],
     ],
@@ -2913,6 +3167,19 @@ function gerarPDF(){
     state.materiais.map(r=>[r.nome||'—', r.unidade||'—', String(num(r.qtd)), brl(num(r.valorUnit)), brl(num(r.qtd)*num(r.valorUnit))]),
     ['', '', '', 'Subtotal', brl(tMat)],
     {2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}}
+  );
+
+  // ---------- HOSPEDAGEM ----------
+  novaSecaoTabela(
+    'HOSPEDAGEM',
+    ['Hotel / Local', 'Hóspede(s)', 'Check-in', 'Check-out', 'Diárias', 'Valor Diária (R$)', 'Total (R$)'],
+    state.hospedagem.map(r=>[
+      r.nome||'—', r.hospede||'—',
+      r.checkin ? formatarDataBR(r.checkin) : '—', r.checkout ? formatarDataBR(r.checkout) : '—',
+      String(num(r.diarias)), brl(num(r.valorDiaria)), brl(num(r.diarias)*num(r.valorDiaria))
+    ]),
+    ['', '', '', '', '', 'Subtotal', brl(tHosp)],
+    {4:{halign:'right'},5:{halign:'right'},6:{halign:'right'}}
   );
 
   // ---------- IMPOSTOS E TAXAS ----------
@@ -3000,7 +3267,7 @@ function gerarExcel(){
     alert('A biblioteca de geração de planilhas ainda não carregou. Verifique sua conexão com a internet e tente novamente em alguns segundos.');
     return;
   }
-  const {tFunc, tVeic, tComb, tMat, total} = totais();
+  const {tFunc, tVeic, tComb, tMat, tHosp, total} = totais();
   const tImp = calcTotalImpostos();
   const totalFinal = total + tImp;
   const rate = state.cotacao;
@@ -3030,6 +3297,7 @@ function gerarExcel(){
     ['Veículos', tVeic, rate ? tVeic/rate : ''],
     ['Combustível', tComb, rate ? tComb/rate : ''],
     ['Materiais e Investimentos', tMat, rate ? tMat/rate : ''],
+    ['Hospedagem', tHosp, rate ? tHosp/rate : ''],
     ['Subtotal dos Custos', total, rate ? total/rate : ''],
     ['Impostos e Taxas', tImp, rate ? tImp/rate : ''],
     ['TOTAL GERAL DO PROJETO', totalFinal, rate ? totalFinal/rate : ''],
@@ -3070,6 +3338,18 @@ function gerarExcel(){
   wsMat['!cols'] = [{wch:30},{wch:16},{wch:12},{wch:18},{wch:14}];
   XLSX.utils.book_append_sheet(wb, wsMat, 'Materiais');
 
+  // ---- Aba HOSPEDAGEM ----
+  const hospHead = ['Hotel/Local','Hóspede(s)','Check-in','Check-out','Diárias','Valor Diária (R$)','Total (R$)'];
+  const hospRows = state.hospedagem.map(r=>[
+    r.nome, r.hospede,
+    r.checkin ? formatarDataBR(r.checkin) : '', r.checkout ? formatarDataBR(r.checkout) : '',
+    num(r.diarias), num(r.valorDiaria), num(r.diarias)*num(r.valorDiaria)
+  ]);
+  hospRows.push(['','','','','', 'SUBTOTAL', tHosp]);
+  const wsHosp = XLSX.utils.aoa_to_sheet([hospHead, ...hospRows]);
+  wsHosp['!cols'] = [{wch:24},{wch:20},{wch:12},{wch:12},{wch:10},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, wsHosp, 'Hospedagem');
+
   // ---- Aba IMPOSTOS E TAXAS ----
   const tot = totais();
   const impHead = ['Nome','Tipo','Base de Cálculo','Alíquota/Valor','Valor Calculado (R$)'];
@@ -3102,6 +3382,7 @@ function serializeProject(){
     veiculos: state.veiculos,
     combustivel: state.combustivel,
     materiais: state.materiais,
+    hospedagem: state.hospedagem,
     impostos: state.impostos,
     margemDesejada: state.margemDesejada,
     valorContrato: state.valorContrato,
@@ -3118,6 +3399,7 @@ function loadProjectData(data, id){
   state.veiculos = data.veiculos || [];
   state.combustivel = data.combustivel || [];
   state.materiais = data.materiais || [];
+  state.hospedagem = data.hospedagem || [];
   state.impostos = data.impostos || [];
   state.margemDesejada = (data.margemDesejada!=null) ? data.margemDesejada : 20;
   state.valorContrato = data.valorContrato || 0;
@@ -3126,7 +3408,7 @@ function loadProjectData(data, id){
 
   // evita colisão de ids ao adicionar novas linhas depois de carregar
   let maxId = 0;
-  ['funcionarios','veiculos','combustivel','materiais','impostos'].forEach(col=>{
+  ['funcionarios','veiculos','combustivel','materiais','hospedagem','impostos'].forEach(col=>{
     state[col].forEach(r=>{ if(r.id > maxId) maxId = r.id; });
   });
   uid = maxId + 1;
@@ -3146,6 +3428,7 @@ function loadProjectData(data, id){
   renderVeiculos();
   renderCombustivel();
   renderMateriais();
+  renderHospedagem();
   renderImpostos();
   recalcLucro();
   recalcContrato();
@@ -3246,6 +3529,7 @@ function iniciarListenerProjetos(){
     renderRanking();
     populateFiltroProjeto();
     if(tabAtiva('dashboard')) renderDashboard();
+    if(tabAtiva('comparar')) renderComparador();
   }, err=>{
     console.error('Erro ao ler projetos do Firebase:', err);
   });
@@ -3269,6 +3553,7 @@ function iniciarListenerFuncionarios(){
         nome: v.nome || '',
         funcao: v.funcao || '',
         telefone: v.telefone || '+55 ',
+        email: v.email || '',
         folgas: v.folgas || [],
         ferias: v.ferias || [],
       });
@@ -3285,22 +3570,68 @@ function iniciarListenerFuncionarios(){
   });
 }
 
+let editandoFuncionarioId = null;
+
 function addFuncionarioGlobal(){
   if(!currentUser){ alert('Faça login para cadastrar funcionários.'); return; }
   const nome = document.getElementById('eq-nome').value.trim();
   const funcao = document.getElementById('eq-funcao').value.trim();
   let telefone = document.getElementById('eq-telefone').value.trim();
+  const email = document.getElementById('eq-email').value.trim();
   if(!nome){ alert('Informe o nome do funcionário.'); return; }
   if(!telefone.replace('+55','').trim()){ telefone = '+55 '; }
+
+  if(editandoFuncionarioId){
+    firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+editandoFuncionarioId)
+      .update({ nome, funcao, telefone, email })
+      .then(cancelarEdicaoFuncionarioGlobal)
+      .catch(err=> alert('Erro ao salvar alterações: ' + err.message));
+    return;
+  }
+
   const ref = firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais').push();
-  ref.set({nome, funcao, telefone, folgas:[], ferias:[], criadoEm: Date.now()}).then(()=>{
+  ref.set({nome, funcao, telefone, email, folgas:[], ferias:[], criadoEm: Date.now()}).then(()=>{
     document.getElementById('eq-nome').value = '';
     document.getElementById('eq-funcao').value = '';
     document.getElementById('eq-telefone').value = '+55 ';
+    document.getElementById('eq-email').value = '';
   }).catch(err=> alert('Erro ao cadastrar: ' + err.message));
+}
+/* carrega um funcionário já cadastrado no formulário para edição */
+function editarFuncionarioGlobal(id){
+  const f = funcionariosGlobais.find(x=>x.id===id);
+  if(!f) return;
+  editandoFuncionarioId = id;
+  document.getElementById('eq-nome').value = f.nome || '';
+  document.getElementById('eq-funcao').value = f.funcao || '';
+  document.getElementById('eq-telefone').value = f.telefone || '+55 ';
+  document.getElementById('eq-email').value = f.email || '';
+  atualizarBotaoFuncionarioGlobal();
+  document.getElementById('eq-nome').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function cancelarEdicaoFuncionarioGlobal(){
+  editandoFuncionarioId = null;
+  document.getElementById('eq-nome').value = '';
+  document.getElementById('eq-funcao').value = '';
+  document.getElementById('eq-telefone').value = '+55 ';
+  document.getElementById('eq-email').value = '';
+  atualizarBotaoFuncionarioGlobal();
+}
+function atualizarBotaoFuncionarioGlobal(){
+  const btn = document.getElementById('btnCadastrarFuncionario');
+  const cancelBtn = document.getElementById('btnCancelarEdicaoFuncionario');
+  if(!btn) return;
+  if(editandoFuncionarioId){
+    btn.textContent = '💾 Salvar Alterações';
+    cancelBtn.style.display = 'inline-flex';
+  } else {
+    btn.textContent = '+ Cadastrar Funcionário';
+    cancelBtn.style.display = 'none';
+  }
 }
 function removeFuncionarioGlobal(id, nome){
   if(!confirm('Excluir o cadastro de "'+nome+'"? Isso não remove as alocações já lançadas dentro dos projetos.')) return;
+  if(editandoFuncionarioId===id) cancelarEdicaoFuncionarioGlobal();
   firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+id).remove()
     .catch(err=> alert('Erro ao excluir: ' + err.message));
 }
@@ -3443,8 +3774,10 @@ function renderEquipe(){
       <div class="emp-status-label ${status.tipo}">${status.label}${status.retorno ? (' · retorna em ' + brDate(status.retorno)) : ''}</div>
       ${conflictHtml}
       <div class="emp-row"><span>Telefone</span><span>${esc(f.telefone||'—')}</span></div>
+      <div class="emp-row"><span>E-mail</span><span>${esc(f.email||'—')}</span></div>
       <div class="emp-actions">
-        <button class="btn btn-whatsapp" onclick="enviarWhatsapp('${f.id}')">📲 WhatsApp</button>
+        <button class="btn btn-ghost" onclick="editarFuncionarioGlobal('${f.id}')">✏️ Editar</button>
+        <button class="btn btn-whatsapp" onclick="abrirModalMensagem('${f.id}')">✉️ Enviar Mensagem</button>
         <button class="btn btn-del" onclick="removeFuncionarioGlobal('${f.id}','${esc(f.nome).replace(/'/g,'')}')">Excluir</button>
       </div>
     </div>`;
@@ -3452,24 +3785,111 @@ function renderEquipe(){
 }
 
 /* monta e abre o link do WhatsApp (wa.me) com o relatório completo de escala do funcionário */
-function enviarWhatsapp(empId){
-  const f = funcionariosGlobais.find(x=>x.id===empId);
-  if(!f) return;
-  const numero = (f.telefone||'').replace(/[^0-9]/g,'');
-  if(numero.length<12){ alert('Cadastre um telefone válido (com DDI +55 e DDD) para este funcionário antes de enviar.'); return; }
+/* monta o relatório completo de um funcionário: projetos escalados + folgas + férias.
+   Usado tanto pelo WhatsApp quanto pelo E-mail, para os dois canais informarem o mesmo conteúdo. */
+function montarMensagemFuncionario(f){
   const {alocs} = detectarConflitos();
   const minhas = alocs.filter(a=> a.nomeNorm===normNome(f.nome)).sort((a,b)=> a.inicio<b.inicio?-1:1);
-  let msg = 'Olá ' + f.nome + '! Segue sua escala de projetos:\n\n';
+  let msg = 'Olá ' + f.nome + '!\n\n';
+
+  msg += '📁 PROJETOS EM QUE VOCÊ ESTÁ ESCALADO(A):\n';
   if(minhas.length===0){
-    msg += 'Nenhum projeto com datas definidas no momento.';
+    msg += 'Nenhum projeto com datas definidas no momento.\n';
   } else {
     minhas.forEach((a,i)=>{
       msg += (i+1)+') Projeto: '+a.projetoNome+'\n   Cliente: '+a.cliente+'\n   Local: '+(a.local || 'Não informado')+'\n   Período: '+brDate(a.inicio)+' a '+brDate(a.fim)+'\n\n';
     });
   }
-  msg += 'Qualquer dúvida, entre em contato.';
+
+  const folgas = (f.folgas||[]).slice().sort((a,b)=> a.inicio<b.inicio?-1:1);
+  msg += '\n🏖️ FOLGAS CADASTRADAS:\n';
+  if(folgas.length===0){
+    msg += 'Nenhuma folga cadastrada.\n';
+  } else {
+    folgas.forEach(p=>{ msg += '- '+brDate(p.inicio)+' a '+brDate(p.fim)+' ('+diasEntre(p.inicio,p.fim)+' dia(s))\n'; });
+  }
+
+  const ferias = (f.ferias||[]).slice().sort((a,b)=> a.inicio<b.inicio?-1:1);
+  msg += '\n🌴 FÉRIAS CADASTRADAS:\n';
+  if(ferias.length===0){
+    msg += 'Nenhuma férias cadastrada.\n';
+  } else {
+    ferias.forEach(p=>{ msg += '- '+brDate(p.inicio)+' a '+brDate(p.fim)+' ('+diasEntre(p.inicio,p.fim)+' dia(s))\n'; });
+  }
+
+  msg += '\nQualquer dúvida, entre em contato.';
+  return msg;
+}
+
+/* ===== Modal de mensagem editável (WhatsApp / E-mail) ===== */
+let msgModalEmpId = null;
+
+function abrirModalMensagem(empId){
+  const f = funcionariosGlobais.find(x=>x.id===empId);
+  if(!f) return;
+  msgModalEmpId = empId;
+  document.getElementById('msgModalNome').textContent = 'Para: ' + f.nome;
+  document.getElementById('msgModalTexto').value = montarMensagemFuncionario(f);
+  document.getElementById('msgModalOverlay').style.display = 'flex';
+}
+function fecharModalMensagem(){
+  document.getElementById('msgModalOverlay').style.display = 'none';
+  msgModalEmpId = null;
+}
+function confirmarEnvioWhatsapp(){
+  const f = funcionariosGlobais.find(x=>x.id===msgModalEmpId);
+  if(!f) return;
+  const numero = (f.telefone||'').replace(/[^0-9]/g,'');
+  if(numero.length<12){ alert('Cadastre um telefone válido (com DDI +55 e DDD) para este funcionário antes de enviar.'); return; }
+  const msg = document.getElementById('msgModalTexto').value;
   const url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
+  fecharModalMensagem();
+}
+/* abre o app de e-mail padrão do usuário com o texto editado no modal.
+   Se o funcionário ainda não tiver e-mail cadastrado, pede uma vez e salva pra próxima. */
+function confirmarEnvioEmail(){
+  const f = funcionariosGlobais.find(x=>x.id===msgModalEmpId);
+  if(!f) return;
+  let email = (f.email||'').trim();
+  if(!email){
+    email = prompt('Este funcionário ainda não tem e-mail cadastrado.\nInforme o e-mail para enviar agora (será salvo no cadastro dele):');
+    if(!email) return;
+    email = email.trim();
+    if(currentUser){
+      firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+msgModalEmpId+'/email').set(email).catch(()=>{});
+    }
+  }
+  // assunto inclui o nome do funcionário para ficar claro pra quem é o e-mail (evita cair em spam por parecer genérico)
+  const assunto = 'Escala de Projetos, Folgas e Férias — ' + f.nome;
+  const corpo = document.getElementById('msgModalTexto').value;
+  // abre o compositor do Gmail direto no navegador — mais confiável que "mailto:", que só funciona
+  // se houver um programa de e-mail padrão configurado no computador (o que normalmente NÃO é o caso
+  // de quem usa Gmail só pelo navegador — por isso o e-mail "não chegava").
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1&tf=1'
+    + '&to=' + encodeURIComponent(email)
+    + '&su=' + encodeURIComponent(assunto)
+    + '&body=' + encodeURIComponent(corpo);
+  window.open(url, '_blank');
+  fecharModalMensagem();
+}
+/* alternativa para quem NÃO usa Gmail: abre o programa de e-mail padrão do computador (Outlook, etc.) */
+function confirmarEnvioEmailPadrao(){
+  const f = funcionariosGlobais.find(x=>x.id===msgModalEmpId);
+  if(!f) return;
+  let email = (f.email||'').trim();
+  if(!email){
+    email = prompt('Este funcionário ainda não tem e-mail cadastrado.\nInforme o e-mail para enviar agora (será salvo no cadastro dele):');
+    if(!email) return;
+    email = email.trim();
+    if(currentUser){
+      firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+msgModalEmpId+'/email').set(email).catch(()=>{});
+    }
+  }
+  const assunto = 'Escala de Projetos, Folgas e Férias — ' + f.nome;
+  const corpo = document.getElementById('msgModalTexto').value;
+  window.location.href = 'mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(corpo);
+  fecharModalMensagem();
 }
 
 /* =========================================================
@@ -3889,8 +4309,9 @@ function metricasDoProjeto(p){
   const tVeic = (p.veiculos||[]).reduce((a,r)=>a + num(r.dias)*num(r.custoDiaria), 0);
   const tComb = (p.combustivel||[]).reduce((a,r)=>a + num(r.litros)*num(r.precoLitro), 0);
   const tMat  = (p.materiais||[]).reduce((a,r)=>a + num(r.qtd)*num(r.valorUnit), 0);
-  const custoDireto = tFunc + tVeic + tComb + tMat;
-  const tot = {tFunc, tVeic, tComb, tMat, total:custoDireto};
+  const tHosp = (p.hospedagem||[]).reduce((a,r)=>a + num(r.diarias)*num(r.valorDiaria), 0);
+  const custoDireto = tFunc + tVeic + tComb + tMat + tHosp;
+  const tot = {tFunc, tVeic, tComb, tMat, tHosp, total:custoDireto};
   const tImp = (p.impostos||[]).reduce((a,r)=> a + valorImposto(r, tot), 0);
   const custo = custoDireto + tImp;
   const contratoVal = num(p.valorContrato || (p.contrato && p.contrato.valor) || 0);
@@ -3954,6 +4375,190 @@ function renderRanking(){
       <td class="num">${m.margemReal.toFixed(1).replace('.',',')}%</td>
       <td>${m.contratoVal>0 ? (m.viavel?'<span class="badge badge-ok">Viável</span>':'<span class="badge badge-warn">Abaixo</span>') : '<span class="hint">—</span>'}</td>
     </tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   COMPARADOR DE PROJETOS
+   ========================================================= */
+let comparadorSelecionados = new Set();
+
+function renderComparador(){
+  const wrap = document.getElementById('compSelecao');
+  if(!currentUser || projetosSalvos.length===0){
+    wrap.innerHTML = '<div class="hint" style="padding:8px 0; color:var(--muted);">Nenhum projeto salvo ainda para comparar.</div>';
+    document.getElementById('compTabela').innerHTML = '';
+    return;
+  }
+  comparadorSelecionados.forEach(id=>{ if(!projetosSalvos.some(p=>p.id===id)) comparadorSelecionados.delete(id); });
+
+  wrap.innerHTML = projetosSalvos.map(p=>{
+    const nome = (p.projeto && p.projeto.nome) || 'Sem nome';
+    const marcado = comparadorSelecionados.has(p.id);
+    return '<label class="comp-check-item"><input type="checkbox" '+(marcado?'checked':'')+' onchange="toggleComparador(\''+p.id+'\', this.checked)"> '+esc(nome)+'</label>';
+  }).join('');
+  renderTabelaComparador();
+}
+
+function toggleComparador(id, checked){
+  if(checked){
+    if(comparadorSelecionados.size>=3){
+      alert('Você pode comparar no máximo 3 projetos por vez.');
+      renderComparador();
+      return;
+    }
+    comparadorSelecionados.add(id);
+  } else {
+    comparadorSelecionados.delete(id);
+  }
+  renderTabelaComparador();
+}
+
+function renderTabelaComparador(){
+  const el = document.getElementById('compTabela');
+  const selecionados = projetosSalvos.filter(p=> comparadorSelecionados.has(p.id));
+  if(selecionados.length < 2){
+    el.innerHTML = '<div class="hint" style="padding:20px; text-align:center; color:var(--muted);">Selecione pelo menos 2 projetos acima para ver a comparação.</div>';
+    return;
+  }
+  const linhas = selecionados.map(p=>{
+    const m = metricasDoProjeto(p);
+    const fluxo = calcularFluxoMensalDe(p);
+    return {
+      nome: (p.projeto && p.projeto.nome) || 'Sem nome',
+      cliente: (p.projeto && p.projeto.cliente) || '—',
+      custo: m.custo, contrato: m.contratoVal, lucro: m.lucro,
+      margemReal: m.margemReal, margemDesejada: m.margemDesejada, viavel: m.viavel,
+      roi: fluxo ? fluxo.roiTotal : null, prazo: fluxo ? fluxo.N : null,
+    };
+  });
+
+  function linha(label, chave, formato){
+    const valores = linhas.map(l=> l[chave]);
+    let melhorIdx = -1;
+    if(formato!=='texto'){
+      const nums = valores.map(v=> v===null||v===undefined ? -Infinity : v);
+      melhorIdx = nums.indexOf(Math.max(...nums));
+      if(nums.every(n=>n===-Infinity)) melhorIdx = -1;
+    }
+    return '<tr><td>'+label+'</td>' + linhas.map((l,i)=>{
+      const v = l[chave];
+      let txt;
+      if(v===null || v===undefined) txt = '—';
+      else if(formato==='brl') txt = brl(v);
+      else if(formato==='pct') txt = v.toFixed(1).replace('.',',')+'%';
+      else if(formato==='meses') txt = v + ' meses';
+      else txt = esc(String(v));
+      const destaque = (i===melhorIdx && v!==null && v!==undefined) ? ' style="font-weight:800; color:var(--good);"' : '';
+      return '<td class="num"'+destaque+'>'+txt+'</td>';
+    }).join('') + '</tr>';
+  }
+
+  el.innerHTML = `
+    <table class="rank-table">
+      <thead><tr><th>Indicador</th>${linhas.map(l=>'<th>'+esc(l.nome)+'</th>').join('')}</tr></thead>
+      <tbody>
+        <tr><td>Cliente</td>${linhas.map(l=>'<td>'+esc(l.cliente)+'</td>').join('')}</tr>
+        ${linha('Custo Total','custo','brl')}
+        ${linha('Valor do Contrato','contrato','brl')}
+        ${linha('Lucro Estimado','lucro','brl')}
+        ${linha('Margem Real','margemReal','pct')}
+        ${linha('Margem Desejada','margemDesejada','pct')}
+        ${linha('ROI Total sobre o Custo','roi','pct')}
+        ${linha('Prazo do Contrato','prazo','meses')}
+        <tr><td>Bate a meta de margem?</td>${linhas.map(l=> '<td>'+(l.contrato>0 ? (l.viavel?'<span class="badge badge-ok">Sim</span>':'<span class="badge badge-warn">Não</span>') : '<span class="hint">—</span>')+'</td>').join('')}</tr>
+      </tbody>
+    </table>
+    <div class="hint" style="margin-top:8px;">Os valores em <b style="color:var(--good);">verde</b> indicam o melhor resultado entre os projetos comparados em cada linha.</div>
+  `;
+}
+
+/* =========================================================
+   COMPARADOR DE CUSTOS / COTAÇÕES (fornecedores, aluguel, etc.)
+   Agrupa por categoria/produto — só compara opções do MESMO item entre si.
+   ========================================================= */
+let comparadorCustosItens = [];
+
+function addOpcaoComparadorCustos(){
+  const categoria = document.getElementById('cc-categoria').value.trim() || 'Sem categoria';
+  const nome = document.getElementById('cc-nome').value.trim();
+  const valor = num(document.getElementById('cc-valor').value);
+  const qtd = num(document.getElementById('cc-qtd').value);
+  const unidade = document.getElementById('cc-unidade').value.trim() || 'un';
+  if(!nome){ alert('Informe o nome do fornecedor/opção.'); return; }
+  if(valor<=0 || qtd<=0){ alert('Informe um valor e uma quantidade maiores que zero.'); return; }
+  comparadorCustosItens.push({ id: 'cc'+Date.now()+Math.random().toString(36).slice(2,6), categoria, nome, valor, qtd, unidade });
+  document.getElementById('cc-nome').value = '';
+  document.getElementById('cc-valor').value = '';
+  document.getElementById('cc-qtd').value = '';
+  renderComparadorCustos();
+}
+function removeOpcaoComparadorCustos(id){
+  comparadorCustosItens = comparadorCustosItens.filter(i=>i.id!==id);
+  renderComparadorCustos();
+}
+function limparComparadorCustos(){
+  if(comparadorCustosItens.length===0) return;
+  if(!confirm('Limpar todas as opções comparadas?')) return;
+  comparadorCustosItens = [];
+  renderComparadorCustos();
+}
+/* separa os itens em grupos por categoria (mantendo a ordem em que cada categoria apareceu primeiro) */
+function agruparComparadorPorCategoria(itens){
+  const grupos = {};
+  const ordem = [];
+  itens.forEach(it=>{
+    const chave = (it.categoria||'Sem categoria').trim() || 'Sem categoria';
+    if(!grupos[chave]){ grupos[chave] = []; ordem.push(chave); }
+    grupos[chave].push(it);
+  });
+  return ordem.map(cat=> ({ categoria: cat, itens: grupos[cat] }));
+}
+function renderComparadorCustos(){
+  const wrap = document.getElementById('comparadorCustosGrupos');
+  if(!wrap) return;
+  if(comparadorCustosItens.length===0){
+    wrap.innerHTML = '<div class="card"><div style="padding:26px; text-align:center; color:var(--muted); font-style:italic;">Nenhuma opção adicionada ainda. Preencha a Categoria (ex: Carro, Internet, Hospedagem) e as opções de cada fornecedor acima — cada categoria será comparada separadamente.</div></div>';
+    return;
+  }
+  const grupos = agruparComparadorPorCategoria(comparadorCustosItens);
+  wrap.innerHTML = grupos.map(g=>{
+    const comCusto = g.itens.map(it=> Object.assign({}, it, { custoUnit: it.valor / it.qtd }));
+    const menorCusto = Math.min(...comCusto.map(it=>it.custoUnit));
+    const ordenado = comCusto.slice().sort((a,b)=> a.custoUnit - b.custoUnit);
+    const melhor = ordenado[0];
+    const linhas = ordenado.map(it=>{
+      const ehMelhor = it.custoUnit === menorCusto;
+      const diff = it.custoUnit - menorCusto;
+      const diffPct = menorCusto>0 ? (diff/menorCusto*100) : 0;
+      return `<tr ${ehMelhor ? 'style="background:var(--good-bg);"' : ''}>
+        <td>${esc(it.nome)} ${ehMelhor ? '<span class="badge badge-ok">Melhor opção</span>' : ''}</td>
+        <td class="num">${brl(it.valor)}</td>
+        <td class="num">${it.qtd} ${esc(it.unidade)}</td>
+        <td class="num" ${ehMelhor ? 'style="color:var(--good); font-weight:800;"' : ''}>${brl(it.custoUnit)}/${esc(it.unidade)}</td>
+        <td class="num">${ehMelhor ? '—' : ('+ '+brl(diff)+' ('+diffPct.toFixed(0)+'% mais caro)')}</td>
+        <td class="col-tiny"><button class="btn-del" onclick="removeOpcaoComparadorCustos('${it.id}')">✕</button></td>
+      </tr>`;
+    }).join('');
+    return `<div class="card comp-group-card">
+      <div class="comp-group-head">
+        <b>📦 ${esc(g.categoria)}</b>
+        <span class="comp-group-best">🏆 Melhor opção: <b>${esc(melhor.nome)}</b> — ${brl(melhor.custoUnit)}/${esc(melhor.unidade)} (${g.itens.length} opç${g.itens.length>1?'ões':'ão'} comparada${g.itens.length>1?'s':''})</span>
+      </div>
+      <div class="table-scroll">
+        <table class="datatable">
+          <thead><tr>
+            <th style="width:26%">Fornecedor / Opção</th>
+            <th style="width:16%">Valor Total</th>
+            <th style="width:14%">Quantidade</th>
+            <th style="width:18%">Custo por Unidade</th>
+            <th style="width:18%">Comparado ao melhor</th>
+            <th class="col-tiny"></th>
+          </tr></thead>
+          <tbody>${linhas}</tbody>
+        </table>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -4035,6 +4640,7 @@ addFuncionario();
 addVeiculo();
 addCombustivel();
 addMaterial();
+addHospedagem();
 renderImpostos();
 fetchCotacao();
 renderResumo();
@@ -4047,6 +4653,7 @@ renderFolgasFerias();
 renderCalendario('calProjetos');
 renderCalendario('calEscala');
 renderDashboard();
+renderComparadorCustos();
 </script>
 </body>
 </html>
