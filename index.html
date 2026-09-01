@@ -519,6 +519,14 @@ table.datatable td .field-row input{flex:1;}
 
 /* ===== FOLGAS & FÉRIAS ===== */
 .leave-cols{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+
+/* ===== DASHBOARD / VISÃO GERAL ===== */
+.dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.dash-panel{padding:0; overflow:hidden;}
+.dash-panel-head{padding:10px 14px; border-bottom:1px solid var(--line); background:#FAFAFB; font-weight:700; font-size:12px;}
+.dash-panel .leave-list{padding:4px 14px;}
+.dash-panel .leave-list li span:first-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:8px;}
+.dash-panel .hint{padding:16px !important;}
 .leave-list{list-style:none; margin:0; padding:0;}
 .leave-list li{display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border-bottom:1px solid var(--line); font-size:12px;}
 .leave-list li:last-child{border-bottom:none;}
@@ -570,6 +578,7 @@ table.datatable td .field-row input{flex:1;}
   .tb-cell.span2, .tb-cell.span3{grid-column:span 1;}
   .equipe-grid{grid-template-columns:1fr;}
   .proj-grid{grid-template-columns:1fr;}
+  .dash-grid{grid-template-columns:1fr;}
   .cal-day{min-height:64px; font-size:10px;}
   .cal-grid-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch;}
   .cal-grid{min-width:640px;}
@@ -623,6 +632,7 @@ html.dark-theme .btn:hover{background:var(--accent-blue-tint);}
 html.dark-theme .btn-add{background:#000; color:#fff;}
 html.dark-theme .table-toolbar,
 html.dark-theme .list-toolbar,
+html.dark-theme .dash-panel-head,
 html.dark-theme .cancel-box{background:var(--content-bg);}
 html.dark-theme table.datatable tbody tr:nth-child(even),
 html.dark-theme .rank-table tbody tr:nth-child(even),
@@ -764,8 +774,13 @@ html.dark-theme #authScreen{background:var(--content-bg);}
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebarEl">
     <nav class="nav" id="navList">
-      <div class="nav-group-label" style="padding-top:14px;">Projeto Atual</div>
-      <button data-tab="projeto" class="active">
+      <div class="nav-group-label">Início</div>
+      <button data-tab="dashboard" class="active">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Visão Geral
+      </button>
+      <div class="nav-group-label">Projeto Atual</div>
+      <button data-tab="projeto">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h10"/></svg>
         Dados do Projeto
       </button>
@@ -842,8 +857,39 @@ html.dark-theme #authScreen{background:var(--content-bg);}
   <div class="main">
     <div class="content">
 
+      <!-- TAB: VISÃO GERAL (DASHBOARD) -->
+      <section class="tab active" id="tab-dashboard">
+        <div class="sec-head">
+          <div>
+            <h2>Visão Geral</h2>
+            <div class="sec-desc">O que está acontecendo agora: projetos em andamento, retornos de folga/férias e parcelas de contrato próximas do vencimento.</div>
+          </div>
+        </div>
+
+        <div class="metric-strip" id="dashStats"></div>
+
+        <div class="dash-grid">
+          <div class="card dash-panel">
+            <div class="dash-panel-head">📁 Projetos em Andamento</div>
+            <div id="dashProjetosAtivos"></div>
+          </div>
+          <div class="card dash-panel">
+            <div class="dash-panel-head">🏖️ Retornando nos Próximos 7 Dias</div>
+            <div id="dashRetornos"></div>
+          </div>
+          <div class="card dash-panel">
+            <div class="dash-panel-head">💳 Parcelas Vencendo (15 dias)</div>
+            <div id="dashParcelas"></div>
+          </div>
+          <div class="card dash-panel">
+            <div class="dash-panel-head">⚠️ Conflitos de Agenda</div>
+            <div id="dashConflitos"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- TAB: PROJETO -->
-      <section class="tab active" id="tab-projeto">
+      <section class="tab" id="tab-projeto">
         <div class="sec-head">
           <div>
             <h2>Dados do Projeto</h2>
@@ -1351,6 +1397,7 @@ html.dark-theme #authScreen{background:var(--content-bg);}
           <div class="cal-label" id="calProjetos-label">—</div>
           <button class="btn btn-ghost" onclick="calMudarMes('calProjetos', 1)">Próximo ›</button>
           <button class="btn btn-outline" onclick="calIrHoje('calProjetos')">Hoje</button>
+          <button class="btn btn-primary" style="margin-left:auto;" onclick="gerarPDFCalendario('calProjetos')">📄 Exportar PDF do Mês</button>
         </div>
         <div class="cal-grid-wrap"><div class="cal-grid" id="calProjetos-grid"></div></div>
         <div class="cal-legend"><span><i style="background:var(--accent-blue-tint); border:1px solid var(--accent-blue);"></i> Projeto em andamento</span></div>
@@ -1366,6 +1413,7 @@ html.dark-theme #authScreen{background:var(--content-bg);}
           <div class="cal-label" id="calEscala-label">—</div>
           <button class="btn btn-ghost" onclick="calMudarMes('calEscala', 1)">Próximo ›</button>
           <button class="btn btn-outline" onclick="calIrHoje('calEscala')">Hoje</button>
+          <button class="btn btn-primary" style="margin-left:auto;" onclick="gerarPDFCalendario('calEscala')">📄 Exportar PDF do Mês</button>
         </div>
         <div class="cal-grid-wrap"><div class="cal-grid" id="calEscala-grid"></div></div>
         <div class="cal-legend">
@@ -1401,7 +1449,10 @@ html.dark-theme #authScreen{background:var(--content-bg);}
             <input type="date" id="lv-fim">
           </div>
         </div>
-        <button class="btn btn-add" style="margin-bottom:20px;" onclick="addFolgaFerias()">+ Adicionar Período</button>
+        <div class="field-row" style="margin-bottom:20px;">
+          <button class="btn btn-add" id="btnSalvarPeriodo" onclick="addFolgaFerias()">+ Adicionar Período</button>
+          <button class="btn btn-outline" id="btnCancelarEdicaoPeriodo" style="display:none;" onclick="cancelarEdicaoPeriodo()">Cancelar edição</button>
+        </div>
 
         <div class="leave-cols">
           <div class="card">
@@ -1540,6 +1591,7 @@ function showApp(){
   document.getElementById('userEmailLabel').textContent = currentUser.email;
   document.getElementById('statusUser').textContent = currentUser.email;
   document.getElementById('statusDotConn').classList.remove('off');
+  goToTab('dashboard');
 }
 function showLogin(){
   document.getElementById('authScreen').style.display = 'flex';
@@ -1710,6 +1762,7 @@ function goToTab(tab){
   if(tab==='calProjetos') renderCalendario('calProjetos');
   if(tab==='calEscala') renderCalendario('calEscala');
   if(tab==='folgas') renderFolgasFerias();
+  if(tab==='dashboard') renderDashboard();
 }
 
 /* =========================================================
@@ -1727,8 +1780,7 @@ projFields.forEach(f=>{
 });
 // data padrão = hoje
 (function(){
-  const d = new Date();
-  const iso = d.toISOString().slice(0,10);
+  const iso = hojeISOLocal();
   document.getElementById('p-data').value = iso;
   state.projeto.data = iso;
 })();
@@ -3193,6 +3245,7 @@ function iniciarListenerProjetos(){
     renderMeusProjetos();
     renderRanking();
     populateFiltroProjeto();
+    if(tabAtiva('dashboard')) renderDashboard();
   }, err=>{
     console.error('Erro ao ler projetos do Firebase:', err);
   });
@@ -3225,6 +3278,7 @@ function iniciarListenerFuncionarios(){
     renderEquipe();
     renderFolgasFerias();
     if(tabAtiva('calEscala')) renderCalendario('calEscala');
+    if(tabAtiva('dashboard')) renderDashboard();
     if(tabAtiva('calProjetos')) renderCalendario('calProjetos');
   }, err=>{
     console.error('Erro ao ler funcionários do Firebase:', err);
@@ -3269,6 +3323,14 @@ function normNome(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function brDate(iso){ return iso ? formatarDataBR(iso) : '—'; }
 function tabAtiva(id){ const el = document.getElementById('tab-'+id); return !!(el && el.classList.contains('active')); }
 function addDiasISO(iso, n){ const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+/* retorna a data de HOJE no formato ISO (AAAA-MM-DD) considerando o fuso horário LOCAL do usuário.
+   new Date().toISOString() sozinho converte para UTC, o que "vira o dia" incorretamente à noite
+   em fusos atrás de UTC (ex.: Brasil, UTC-3) — por isso NÃO usamos toISOString() direto aqui. */
+function hojeISOLocal(){
+  const d = new Date();
+  const offsetMs = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offsetMs).toISOString().slice(0,10);
+}
 
 /* reúne todas as alocações (funcionário + período) de todos os projetos: o que está sendo
    editado agora (com as últimas alterações) + todos os demais projetos salvos no Firebase */
@@ -3327,7 +3389,7 @@ function atualizarConflitosEquipe(){
 
 /* status atual de um funcionário: conflito > folga > férias > disponível */
 function statusFuncionario(f, conflitosPorNome){
-  const hojeISO = new Date().toISOString().slice(0,10);
+  const hojeISO = hojeISOLocal();
   const nomeNorm = normNome(f.nome);
   if(conflitosPorNome[nomeNorm] && conflitosPorNome[nomeNorm].length){
     return {tipo:'conflito', label:'Conflito de Agenda'};
@@ -3413,6 +3475,8 @@ function enviarWhatsapp(empId){
 /* =========================================================
    FOLGAS & FÉRIAS
    ========================================================= */
+let editandoPeriodo = null; // {empId, campo, id} do período sendo editado, ou null
+
 function addFolgaFerias(){
   if(!currentUser){ alert('Faça login primeiro.'); return; }
   const empId = document.getElementById('lv-funcionario').value;
@@ -3425,18 +3489,78 @@ function addFolgaFerias(){
   const f = funcionariosGlobais.find(x=>x.id===empId);
   if(!f) return;
   const campo = tipo==='folga' ? 'folgas' : 'ferias';
+
+  if(editandoPeriodo){
+    const idEditado = editandoPeriodo.id;
+    const mudouDeDono = editandoPeriodo.empId!==empId || editandoPeriodo.campo!==campo;
+    if(mudouDeDono){
+      const origem = funcionariosGlobais.find(x=>x.id===editandoPeriodo.empId);
+      const tarefas = [];
+      if(origem){
+        const listaOrigem = (origem[editandoPeriodo.campo]||[]).filter(p=>p.id!==idEditado);
+        tarefas.push(firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+editandoPeriodo.empId+'/'+editandoPeriodo.campo).set(listaOrigem));
+      }
+      const listaDestino = (f[campo]||[]).slice();
+      listaDestino.push({id: idEditado, inicio, fim});
+      tarefas.push(firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+empId+'/'+campo).set(listaDestino));
+      Promise.all(tarefas).then(finalizarFormPeriodo).catch(err=> alert('Erro ao salvar: ' + err.message));
+    } else {
+      const lista = (f[campo]||[]).map(p=> p.id===idEditado ? {id: idEditado, inicio, fim} : p);
+      firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+empId+'/'+campo).set(lista)
+        .then(finalizarFormPeriodo)
+        .catch(err=> alert('Erro ao salvar: ' + err.message));
+    }
+    return;
+  }
+
   const lista = (f[campo]||[]).slice();
   lista.push({id: 'p'+Date.now(), inicio, fim});
   firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+empId+'/'+campo).set(lista)
-    .then(()=>{
-      document.getElementById('lv-inicio').value = '';
-      document.getElementById('lv-fim').value = '';
-    })
+    .then(finalizarFormPeriodo)
     .catch(err=> alert('Erro ao salvar: ' + err.message));
+}
+function finalizarFormPeriodo(){
+  document.getElementById('lv-inicio').value = '';
+  document.getElementById('lv-fim').value = '';
+  editandoPeriodo = null;
+  atualizarBotaoFolgaFerias();
+}
+/* carrega um período já cadastrado no formulário para edição */
+function editarPeriodo(empId, campo, periodoId){
+  const f = funcionariosGlobais.find(x=>x.id===empId);
+  if(!f) return;
+  const periodo = (f[campo]||[]).find(p=>p.id===periodoId);
+  if(!periodo) return;
+  editandoPeriodo = {empId, campo, id: periodoId};
+  document.getElementById('lv-funcionario').value = empId;
+  document.getElementById('lv-tipo').value = campo==='folgas' ? 'folga' : 'ferias';
+  document.getElementById('lv-inicio').value = periodo.inicio;
+  document.getElementById('lv-fim').value = periodo.fim;
+  atualizarBotaoFolgaFerias();
+  document.getElementById('lv-inicio').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function cancelarEdicaoPeriodo(){
+  editandoPeriodo = null;
+  document.getElementById('lv-inicio').value = '';
+  document.getElementById('lv-fim').value = '';
+  atualizarBotaoFolgaFerias();
+}
+function atualizarBotaoFolgaFerias(){
+  const btn = document.getElementById('btnSalvarPeriodo');
+  const cancelBtn = document.getElementById('btnCancelarEdicaoPeriodo');
+  if(!btn) return;
+  if(editandoPeriodo){
+    btn.textContent = '💾 Salvar Alterações';
+    cancelBtn.style.display = 'inline-flex';
+  } else {
+    btn.textContent = '+ Adicionar Período';
+    cancelBtn.style.display = 'none';
+  }
 }
 function removerPeriodo(empId, campo, periodoId){
   const f = funcionariosGlobais.find(x=>x.id===empId);
   if(!f) return;
+  if(editandoPeriodo && editandoPeriodo.id===periodoId) cancelarEdicaoPeriodo();
   const lista = (f[campo]||[]).filter(p=>p.id!==periodoId);
   firebase.database().ref('users/'+currentUser.uid+'/funcionariosGlobais/'+empId+'/'+campo).set(lista)
     .catch(err=> alert('Erro ao remover: ' + err.message));
@@ -3455,10 +3579,10 @@ function renderFolgasFerias(){
   let folgasHtml = '', feriasHtml = '';
   funcionariosGlobais.forEach(f=>{
     (f.folgas||[]).slice().sort((a,b)=> a.inicio<b.inicio?1:-1).forEach(p=>{
-      folgasHtml += '<li><span><b>'+esc(f.nome)+'</b> <span class="lv-period">'+brDate(p.inicio)+' – '+brDate(p.fim)+'</span> ('+diasEntre(p.inicio,p.fim)+'d)</span><button class="btn-del" onclick="removerPeriodo(\''+f.id+'\',\'folgas\',\''+p.id+'\')">✕</button></li>';
+      folgasHtml += '<li><span><b>'+esc(f.nome)+'</b> <span class="lv-period">'+brDate(p.inicio)+' – '+brDate(p.fim)+'</span> ('+diasEntre(p.inicio,p.fim)+'d)</span><span><button class="btn-ghost" style="padding:3px 7px; font-size:11px; margin-right:5px;" onclick="editarPeriodo(\''+f.id+'\',\'folgas\',\''+p.id+'\')">✏️</button><button class="btn-del" onclick="removerPeriodo(\''+f.id+'\',\'folgas\',\''+p.id+'\')">✕</button></span></li>';
     });
     (f.ferias||[]).slice().sort((a,b)=> a.inicio<b.inicio?1:-1).forEach(p=>{
-      feriasHtml += '<li><span><b>'+esc(f.nome)+'</b> <span class="lv-period">'+brDate(p.inicio)+' – '+brDate(p.fim)+'</span> ('+diasEntre(p.inicio,p.fim)+'d)</span><button class="btn-del" onclick="removerPeriodo(\''+f.id+'\',\'ferias\',\''+p.id+'\')">✕</button></li>';
+      feriasHtml += '<li><span><b>'+esc(f.nome)+'</b> <span class="lv-period">'+brDate(p.inicio)+' – '+brDate(p.fim)+'</span> ('+diasEntre(p.inicio,p.fim)+'d)</span><span><button class="btn-ghost" style="padding:3px 7px; font-size:11px; margin-right:5px;" onclick="editarPeriodo(\''+f.id+'\',\'ferias\',\''+p.id+'\')">✏️</button><button class="btn-del" onclick="removerPeriodo(\''+f.id+'\',\'ferias\',\''+p.id+'\')">✕</button></span></li>';
     });
   });
   folgasBox.innerHTML = folgasHtml || '<li class="hint">Nenhuma folga cadastrada.</li>';
@@ -3520,6 +3644,95 @@ function projetosComDatas(){
   return lista;
 }
 
+/* =========================================================
+   DASHBOARD / VISÃO GERAL
+   ========================================================= */
+function renderDashboard(){
+  const statsEl = document.getElementById('dashStats');
+  if(!currentUser){
+    statsEl.innerHTML = '<div class="hint" style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);">Faça login para ver sua visão geral.</div>';
+    ['dashProjetosAtivos','dashRetornos','dashParcelas','dashConflitos'].forEach(id=>{ document.getElementById(id).innerHTML=''; });
+    return;
+  }
+  const hojeISO = hojeISOLocal();
+  const em7dias = addDiasISO(hojeISO, 7);
+  const em15dias = addDiasISO(hojeISO, 15);
+
+  // 1) Projetos ativos agora
+  const ativos = projetosComDatas().filter(p=> p.inicio<=hojeISO && hojeISO<=p.fim);
+
+  // 2) Retornos de folga/férias nos próximos 7 dias
+  const retornos = [];
+  funcionariosGlobais.forEach(f=>{
+    (f.folgas||[]).forEach(p=>{
+      const retorno = addDiasISO(p.fim,1);
+      if(retorno>=hojeISO && retorno<=em7dias) retornos.push({nome:f.nome, tipo:'Folga', retorno});
+    });
+    (f.ferias||[]).forEach(p=>{
+      const retorno = addDiasISO(p.fim,1);
+      if(retorno>=hojeISO && retorno<=em7dias) retornos.push({nome:f.nome, tipo:'Férias', retorno});
+    });
+  });
+  retornos.sort((a,b)=> a.retorno<b.retorno?-1:1);
+
+  // 3) Parcelas de contrato vencendo nos próximos 15 dias
+  const parcelas = [];
+  const candidatosContrato = [{ id: state.projectId||'__atual__', projeto: state.projeto, contrato: state.contrato }];
+  projetosSalvos.forEach(p=>{ if(p.id!==state.projectId) candidatosContrato.push({ id:p.id, projeto:p.projeto||{}, contrato:p.contrato||{} }); });
+  candidatosContrato.forEach(p=>{
+    const c = p.contrato || {};
+    const totalMeses = Math.max(0,num(c.anosDuracao))*12 + Math.max(0,num(c.mesesDuracao));
+    if(c.dataInicio && totalMeses>0 && num(c.valor)>0){
+      const parcela = num(c.valor)/totalMeses;
+      const dataInicio = new Date(c.dataInicio+'T00:00:00');
+      for(let m=1; m<=totalMeses; m++){
+        const d = new Date(dataInicio); d.setMonth(d.getMonth()+m);
+        const dISO = d.toISOString().slice(0,10);
+        if(dISO>=hojeISO && dISO<=em15dias){
+          parcelas.push({ projeto:(p.projeto&&p.projeto.nome)||'Sem nome', valor:parcela, data:dISO, mes:m });
+        }
+      }
+    }
+  });
+  parcelas.sort((a,b)=> a.data<b.data?-1:1);
+
+  // 4) Conflitos de agenda
+  const { conflitosPorNome } = detectarConflitos();
+  const nomesConflito = Object.keys(conflitosPorNome);
+
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="st-label">Projetos em Andamento</div><div class="st-val num">${ativos.length}</div></div>
+    <div class="stat-card" style="border-top-color:var(--amber);"><div class="st-label">Retornos em 7 dias</div><div class="st-val num">${retornos.length}</div></div>
+    <div class="stat-card" style="border-top-color:var(--good);"><div class="st-label">Parcelas em 15 dias</div><div class="st-val num">${parcelas.length}</div></div>
+    <div class="stat-card" style="border-top-color:var(--danger);"><div class="st-label">Conflitos de Agenda</div><div class="st-val num">${nomesConflito.length}</div></div>
+  `;
+
+  document.getElementById('dashProjetosAtivos').innerHTML = ativos.length
+    ? '<ul class="leave-list">' + ativos.map(p=>
+        '<li><span><b>'+esc(p.nome)+'</b> · '+esc(p.cliente)+'</span><span class="lv-period">até '+brDate(p.fim)+'</span></li>'
+      ).join('') + '</ul>'
+    : '<div class="hint">Nenhum projeto em andamento hoje.</div>';
+
+  document.getElementById('dashRetornos').innerHTML = retornos.length
+    ? '<ul class="leave-list">' + retornos.map(r=>
+        '<li><span><b>'+esc(r.nome)+'</b> — '+r.tipo+'</span><span class="lv-period">volta '+brDate(r.retorno)+'</span></li>'
+      ).join('') + '</ul>'
+    : '<div class="hint">Ninguém retornando nos próximos 7 dias.</div>';
+
+  document.getElementById('dashParcelas').innerHTML = parcelas.length
+    ? '<ul class="leave-list">' + parcelas.map(p=>
+        '<li><span><b>'+esc(p.projeto)+'</b> · parcela '+p.mes+'</span><span class="lv-period">'+brl(p.valor)+' em '+brDate(p.data)+'</span></li>'
+      ).join('') + '</ul>'
+    : '<div class="hint">Nenhuma parcela vencendo nos próximos 15 dias.</div>';
+
+  document.getElementById('dashConflitos').innerHTML = nomesConflito.length
+    ? '<ul class="leave-list">' + nomesConflito.map(nomeNorm=>{
+        const par = conflitosPorNome[nomeNorm][0];
+        return '<li><span><b>'+esc(par[0].nomeOriginal)+'</b></span><span class="lv-period" style="color:var(--danger);">'+esc(par[0].projetoNome)+' × '+esc(par[1].projetoNome)+'</span></li>';
+      }).join('') + '</ul>'
+    : '<div class="hint">Nenhum conflito de agenda no momento. ✅</div>';
+}
+
 /* verifica se uma alocação específica está em conflito NO DIA exibido */
 function chipEhConflito(a, conflitosPorNome, iso){
   const pares = conflitosPorNome[a.nomeNorm];
@@ -3543,7 +3756,7 @@ function renderCalendario(qual){
   const startWeekday = primeiroDia.getDay();
   const diasNoMes = new Date(s.ano, s.mes+1, 0).getDate();
   const diasMesAnterior = new Date(s.ano, s.mes, 0).getDate();
-  const hojeISO = new Date().toISOString().slice(0,10);
+  const hojeISO = hojeISOLocal();
 
   let dados, conflitosPorNome = {};
   if(qual==='calProjetos'){
@@ -3584,6 +3797,88 @@ function renderCalendario(qual){
       + '</div>';
   }
   grid.innerHTML = html;
+}
+
+/* gera um PDF (tabela) com os dados do mês exibido no calendário selecionado */
+function gerarPDFCalendario(qual){
+  if(typeof window.jspdf === 'undefined'){
+    alert('A biblioteca de geração de PDF ainda não carregou. Tente novamente em alguns segundos.');
+    return;
+  }
+  const s = calState[qual];
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 14;
+  let y = 16;
+
+  const mesLabel = MESES_PT[s.mes] + ' de ' + s.ano;
+  const inicioMes = new Date(s.ano, s.mes, 1).toISOString().slice(0,10);
+  const fimMes = new Date(s.ano, s.mes+1, 0).toISOString().slice(0,10);
+
+  doc.setLineWidth(0.6); doc.setDrawColor(0,0,0);
+  doc.line(marginX, y, pageW-marginX, y); y += 6;
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text(qual==='calProjetos' ? 'CALENDÁRIO DE PROJETOS' : 'CALENDÁRIO DE ESCALA', marginX, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(mesLabel, pageW-marginX, y, {align:'right'});
+  y += 3; doc.setLineWidth(0.2); doc.line(marginX, y, pageW-marginX, y); y += 8;
+  doc.setFontSize(8.5); doc.setTextColor(90);
+  doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), marginX, y);
+  doc.setTextColor(0); y += 7;
+
+  if(qual==='calProjetos'){
+    const dados = projetosComDatas()
+      .filter(p=> p.inicio<=fimMes && p.fim>=inicioMes)
+      .sort((a,b)=> a.inicio<b.inicio?-1:1);
+    doc.autoTable({
+      startY: y,
+      head: [['Projeto','Cliente','Início','Fim']],
+      body: dados.length ? dados.map(p=>[p.nome, p.cliente, brDate(p.inicio), brDate(p.fim)]) : [['— nenhum projeto em andamento neste mês —','','','']],
+      theme:'grid',
+      styles:{ font:'helvetica', fontSize:9, textColor:20, lineColor:[0,0,0], lineWidth:0.15, cellPadding:2.6 },
+      headStyles:{ fillColor:[35,35,35], textColor:255, fontStyle:'bold' },
+      margin:{left:marginX, right:marginX},
+    });
+  } else {
+    const det = detectarConflitos();
+    const dados = det.alocs
+      .filter(a=> a.inicio<=fimMes && a.fim>=inicioMes)
+      .sort((a,b)=> a.nomeOriginal.localeCompare(b.nomeOriginal) || (a.inicio<b.inicio?-1:1));
+    doc.autoTable({
+      startY: y,
+      head: [['Funcionário','Projeto','Cliente','Início','Fim','Status']],
+      body: dados.length ? dados.map(a=>{
+        const conflito = (det.conflitosPorNome[a.nomeNorm]||[]).length>0;
+        return [a.nomeOriginal, a.projetoNome, a.cliente, brDate(a.inicio), brDate(a.fim), conflito ? 'Conflito' : 'OK'];
+      }) : [['— nenhuma alocação neste mês —','','','','','']],
+      theme:'grid',
+      styles:{ font:'helvetica', fontSize:8.5, textColor:20, lineColor:[0,0,0], lineWidth:0.15, cellPadding:2.4 },
+      headStyles:{ fillColor:[35,35,35], textColor:255, fontStyle:'bold' },
+      columnStyles:{ 5:{ fontStyle:'bold' } },
+      margin:{left:marginX, right:marginX},
+      didParseCell: function(data){
+        if(data.section==='body' && data.column.index===5 && data.cell.raw==='Conflito'){
+          data.cell.styles.textColor = [178,58,38];
+        }
+      },
+    });
+  }
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    const h = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(0,0,0); doc.setLineWidth(0.2);
+    doc.line(marginX, h-14, pageW-marginX, h-14);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+    doc.text('Documento gerado automaticamente em ' + new Date().toLocaleString('pt-BR'), marginX, h-10);
+    doc.text('Página ' + i + ' de ' + pageCount, pageW-marginX, h-10, {align:'right'});
+    doc.setTextColor(0);
+  }
+
+  const prefixo = qual==='calProjetos' ? 'calendario_projetos_' : 'calendario_escala_';
+  downloadBlob(doc.output('blob'), prefixo + s.ano + '_' + String(s.mes+1).padStart(2,'0') + '.pdf');
 }
 
 
@@ -3751,6 +4046,7 @@ renderEquipe();
 renderFolgasFerias();
 renderCalendario('calProjetos');
 renderCalendario('calEscala');
+renderDashboard();
 </script>
 </body>
 </html>
